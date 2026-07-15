@@ -74,7 +74,14 @@ st.markdown(CSS, unsafe_allow_html=True)
 # --------------------------------------------------------------------------- #
 @st.cache_resource(show_spinner=False)
 def get_model():
-    path = WEIGHTS_PATH if os.path.exists(WEIGHTS_PATH) else None
+    # Prefer weights/best_model.pth, but fall back to any .pth in weights/
+    # so the app works regardless of the exact uploaded filename.
+    import glob
+    if os.path.exists(WEIGHTS_PATH):
+        path = WEIGHTS_PATH
+    else:
+        found = sorted(glob.glob("weights/*.pth"))
+        path = found[0] if found else None
     return load_model(path, DEVICE)
 
 
